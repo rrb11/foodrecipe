@@ -25,20 +25,28 @@ router.get('/recipe',function(req,res,next){
 
 router.get('/create',function(req, res, next){
   let user = localStorage.getItem('currentUser');
-  if(user == null)
-  {
+  if(!user){
     return redirect('/');
   }
   user = JSON.parse(user);
-  res.render('create', { title: 'Create Food Recipe', user_id: user.id});
+  res.render('create', { title: 'Create Food Recipe',data:user, user_id: user.id});
+});
+
+router.get('/mycontent',function(req,res,next){
+  let user = localStorage.getItem('currentUser');
+  user = JSON.parse(user);
+  let content = localStorage.getItem(user.id);
+  if(content){
+    content = JSON.parse(content);
+  }
+  console.log(content);
+  res.render('mycontent', { title: 'Content', data: content});
 });
 
 router.get('/:id',function(req, res, next){
   let id = req.params.id;
-  console.log(req.session);
   let lists = localStorage.getItem('allRecipe');
-  if(lists == null)
-  {
+  if(!lists){
     res.redirect('/');
   }
   let data = JSON.parse(lists);
@@ -121,31 +129,32 @@ router.delete('/:id',function(req,res,next){
   let user = localStorage.getItem('currentUser');
   if(user == null)
   {
-    return redirect('/');
+    res.sendStatus(404);
   }
-  let idid = req.params.id;
+  user = JSON.parse(user);
+  let id = req.params.id;
   let lists = localStorage.getItem('allRecipe');
+  let user_list = localStorage.getItem(user.id);
   if(lists == null)
   {
-    res.redirect('/');
+    res.sendStatus(400);
   }
   let data = JSON.parse(lists);
   let arr = _.without(data, _.findWhere(data, {
     id: id
   }));
-  localStorage.setItem('allRecipe',JSON.stringify(arr));
-  res.redirect('/users/recipe');
-});
-
-router.get('/mycontent',function(req,res,next){
-  let user = localStorage.getItem('currentUser');
-  user = JSON.parse(user);
-  let content = localStorage.getItem(user.id);
-  if(content != null)
+  if(user_list == null)
   {
-    content = JSON.parse(content);
+
   }
-  res.render('mycontent', { title: 'Edit', data: content});
+  let user_data = JSON.parse(user_list);
+  let delete_data = _.without(user_data, _.findWhere(data, {
+    id: id
+  }));
+
+  localStorage.setItem('allRecipe',JSON.stringify(arr));
+  localStorage.setItem(user.id,JSON.stringify(delete_data));
+  res.sendStatus(200);
 });
 
 

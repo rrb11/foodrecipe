@@ -7,13 +7,17 @@ if (typeof localStorage === "undefined" || localStorage === null) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  
-  res.render('index', { title: 'Express' });
+  let user = JSON.parse(localStorage.getItem('currentUser'));
+  if(!user){
+    user = null;
+  }
+  res.render('index', { title: 'Express', data: user });
 });
 
 router.get('/logout', (req, res) => {
   let user = JSON.parse(localStorage.getItem('currentUser'));
-  localStorage.removeItem(user.id);
+  // localStorage.removeItem(user.id);
+  localStorage.removeItem('currentUser');
   req.logout();
   req.session = null;
   res.redirect('/');

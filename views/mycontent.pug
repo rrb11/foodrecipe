@@ -1,0 +1,27 @@
+extends layout
+
+block content
+    a(href="/users/create")
+        button.btn.btn-primary Create
+
+    if data == null
+        h1 No Content
+    else
+        table.table.table-striped
+            thead
+                tr
+                    th Name
+                    th Ingredient
+                    th Action
+            tbody
+                each row in data
+                    tr
+                        td 
+                            = row.name
+                        td 
+                            = row.ingredients
+                        td 
+                            a(href="edit/"+row.id)
+                                span.glyphicon.glyphicon-pencil(style='margin-right:8px')
+                            span(id="delete" value=row.id)
+                                span.glyphicon.glyphicon-remove

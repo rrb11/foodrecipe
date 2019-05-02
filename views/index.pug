@@ -1,9 +1,7 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-
-  a.btn.btn-danger(href='/auth/google')
-    span.fa.fa-google-plus
-    | Google
+  if !data
+    a.btn.btn-danger(href='/auth/google')
+      span.fa.fa-google-plus
+      | Google
