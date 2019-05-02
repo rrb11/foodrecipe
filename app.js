@@ -1,12 +1,18 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+const bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const session = require('express-session');
 const passport = require('passport'),
-GoogleStrategy = require('passport-google-oauth20').Strategy;
-const localStorage = require('localStorage');
+GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+if (typeof localStorage === "undefined" || localStorage === null) {
+  var LocalStorage = require('node-localstorage').LocalStorage;
+  localStorage = new LocalStorage('./scratch');
+}
 
+const app = express();
 
 passport.use(new GoogleStrategy({
   clientID: '1093471803296-ijtc9g86pa8hhe3nfh6qrhhsd5iv5fn2.apps.googleusercontent.com',
@@ -14,16 +20,6 @@ passport.use(new GoogleStrategy({
   callbackURL: "http://localhost:3000/auth/google/callback"
 },
 function(accessToken, refreshToken, profile, cb) {
-  // if(localStorage.getItem(data.id))
-  //   {
-  //     return cb(null, JSON.parse(localStorage.getItem(data.id)));
-  //   } else {
-  //       let information = {
-  //           'name': profile.displayName,
-  //       };
-  //       localStorage.setItem(profile.id,JSON.stringify(information));
-  //       return cb(null, information);
-  //   }
   cb(null,profile);
 }
 ));
@@ -40,11 +36,21 @@ passport.deserializeUser(function(obj, cb) {
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-var app = express();
-
 // view engine setup
+app.use(bodyParser.json());      
+app.use(bodyParser.urlencoded({extended: true}));
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'ssshhhhh',
+  // create new redis store.
+  saveUninitialized: false,
+  resave: false
+}));
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -66,14 +72,14 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     req.session.id = req.user.id;
-    res.redirect('/');
+    req.session.username = req.user.name;
+    let user = {
+      'id': req.user.id,
+      'name': req.user.displayName
+    };
+    localStorage.setItem('currentUser',JSON.stringify(user));
+    res.redirect('/users/recipe');
   });
-
-  app.get('/logout', (req, res) => {
-    req.logout();
-    req.session = null;
-    res.redirect('/');
-});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -24,11 +24,18 @@ router.get('/recipe',function(req,res,next){
 });
 
 router.get('/create',function(req, res, next){
-  res.send('A');
+  let user = localStorage.getItem('currentUser');
+  if(user == null)
+  {
+    return redirect('/');
+  }
+  user = JSON.parse(user);
+  res.render('create', { title: 'Create Food Recipe', user_id: user.id});
 });
 
 router.get('/:id',function(req, res, next){
   let id = req.params.id;
+  console.log(req.session);
   let lists = localStorage.getItem('allRecipe');
   if(lists == null)
   {
@@ -43,15 +50,18 @@ router.post('/create',function(req, res, next){
   let user_id = req.body.user_id;
   let uuid = uuidv1();
   let output = [];
+  let user = JSON.parse(localStorage.getItem('currentUser'));
   let createRecipe = {
     'name' : req.body.name,
     'ingredients': req.body.ingredients,
-    'user_name': user_id,
+    'user_name': user.name,
+    'user_id': user.id,
     'id': uuid
   };
+  console.log(createRecipe);
   output.push(createRecipe);
   let user_recipe_lists = localStorage.getItem(user_id);
-  let all_recipe = localStorage.getItem('allRecipe'); console.log(all_recipe);
+  let all_recipe = localStorage.getItem('allRecipe');
   if(all_recipe == null)
   {
     localStorage.setItem('allRecipe',JSON.stringify(output));
@@ -68,7 +78,64 @@ router.post('/create',function(req, res, next){
       recipeLists.push(createRecipe);
       localStorage.setItem(user_id,JSON.stringify(recipeLists));
   }
-  res.json(JSON.parse(localStorage.getItem('allRecipe')));
+  return res.redirect('/users/recipe');
+});
+
+router.get('/edit/:id',function(req, res, next){
+  let user = localStorage.getItem('currentUser');
+  if(user == null)
+  {
+    return redirect('/');
+  }
+  let id = req.params.id;
+  let lists = localStorage.getItem('allRecipe');
+  if(lists == null)
+  {
+    res.redirect('/');
+  }
+  let data = JSON.parse(lists);
+  let receipe_details = _.find(data, function (o) { return o.id == id; });
+  console.log(receipe_details);
+  res.render('edit', { title: 'Edit', data: receipe_details});
+
+});
+
+router.post('/edit',function(req, res,next){
+  let id = req.body.id;
+  let lists = localStorage.getItem('allRecipe');
+  if(lists == null)
+  {
+    res.redirect('/');
+  }
+  let data = JSON.parse(lists);
+  let receipe_details = _.find(data, function (o) { return o.id == id; });
+  if(receipe_details)
+  {
+    receipe_details.name = req.body.name;
+    receipe_details.ingredients = req.body.ingredients;
+  }
+  localStorage.setItem('allRecipe',JSON.stringify(data));
+  res.redirect('/users/recipe');
+});
+
+router.delete('/:id',function(req,res,next){
+  let user = localStorage.getItem('currentUser');
+  if(user == null)
+  {
+    return redirect('/');
+  }
+  let idid = req.params.id;
+  let lists = localStorage.getItem('allRecipe');
+  if(lists == null)
+  {
+    res.redirect('/');
+  }
+  let data = JSON.parse(lists);
+  let arr = _.without(data, _.findWhere(data, {
+    id: id
+  }));
+  localStorage.setItem('allRecipe',JSON.stringify(arr));
+  res.redirect('/users/recipe');
 });
 
 

@@ -8,8 +8,8 @@ block content
   form#createRecipe(method='post' action="/users/create")
       | Recipe Name:
       br
-      input(type='hidden' name='user_id' value='1180')
-      input(type='text' name='recipe_name' value='')
+      input(type='hidden' name='user_id' value=user_id)
+      input(type='text' name='name' value='')
       br
       |                   Ingredients:
       br
