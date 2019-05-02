@@ -95,7 +95,6 @@ router.get('/edit/:id',function(req, res, next){
   }
   let data = JSON.parse(lists);
   let receipe_details = _.find(data, function (o) { return o.id == id; });
-  console.log(receipe_details);
   res.render('edit', { title: 'Edit', data: receipe_details});
 
 });
@@ -136,6 +135,17 @@ router.delete('/:id',function(req,res,next){
   }));
   localStorage.setItem('allRecipe',JSON.stringify(arr));
   res.redirect('/users/recipe');
+});
+
+router.get('/mycontent',function(req,res,next){
+  let user = localStorage.getItem('currentUser');
+  user = JSON.parse(user);
+  let content = localStorage.getItem(user.id);
+  if(content != null)
+  {
+    content = JSON.parse(content);
+  }
+  res.render('mycontent', { title: 'Edit', data: content});
 });
 
 
