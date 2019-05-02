@@ -17,7 +17,7 @@ const app = express();
 passport.use(new GoogleStrategy({
   clientID: '1093471803296-ijtc9g86pa8hhe3nfh6qrhhsd5iv5fn2.apps.googleusercontent.com',
   clientSecret: 'bZ00BXuHIpD6t4iTbgVTOuRj',
-  callbackURL: "http://localhost:3000/auth/google/callback"
+  callbackURL: "https://quiet-cliffs-72534.herokuapp.com/auth/google/callback"
 },
 function(accessToken, refreshToken, profile, cb) {
   cb(null,profile);
