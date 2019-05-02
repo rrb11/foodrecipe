@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    each list in data
+        a(href=list.id)
+            .panel.panel-default
+                .panel-heading
+                    = list.name 
+                .panel-body
+                    = list.user_name

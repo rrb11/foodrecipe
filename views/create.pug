@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+  h2 Create Information
+  form#createRecipe(method='post' action="/users/create")
+      | Recipe Name:
+      br
+      input(type='hidden' name='user_id' value='1180')
+      input(type='text' name='recipe_name' value='')
+      br
+      |                   Ingredients:
+      br
+      input(type='text' name='ingredients' value='')
+      br
+      br
+      button(type='submit') Submit

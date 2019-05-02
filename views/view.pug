@@ -1,0 +1,17 @@
+extends layout
+
+block content
+    table.table.table-bordered
+        tbody
+            tr
+                th Recipe Name
+                td
+                    = data.name
+            tr
+                th Ingredients
+                td
+                    = data.ingredients
+            tr
+                th Name
+                td
+                    = data.user_name
